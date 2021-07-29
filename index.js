@@ -1,6 +1,6 @@
 const http = require("http");
 const hostname = 'localhost';
-const port = 3000;
+const port = 4000;
 
 const express = require('express');
 
@@ -8,7 +8,7 @@ const MongoClient = require('mongodb').MongoClient;
 const ObjectID = require('mongodb').ObjectID;
 
 // Create a new ObjectID
-var objectId = new ObjectID();
+// var objectId = new ObjectID();
 
 // const assert = require('assert');
 const bodyParser = require('body-parser');
@@ -44,12 +44,9 @@ app.get('/', (req, res, next) => {
     });
 });
 
-/*app.get('/', function(req, res, next) {
-  Book.find(function (err, products) {
-    if (err) return next(err);
-    res.json(products);
-  });
-});*/
+app.get('/', function (req, res, next) {
+    res.send({ date: new Date() });
+});
 
 // GET SINGLE Employee BY ID 
 app.get('/:id', function (req, res, next) {
@@ -92,7 +89,8 @@ function mongoOperation(req, res, callback) {
     /////////////////////////////////////////////////
 
     // Connection URL
-    const url = 'mongodb://localhost:27017';
+    const url = 'mongodb+srv://admin:<password>@cluster0.sgmlk.mongodb.net/myFirstDatabase?retryWrites=true&w=majority';
+    // 'mongodb://localhost:27017';
 
     // Database Name
     const dbName = 'employee';
