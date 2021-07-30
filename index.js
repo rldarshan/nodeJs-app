@@ -1,17 +1,18 @@
 // const cors = require("cors");
-
+const config = require('./config.js');
+global.atob = require("atob");
 const express = require('express');
 // const mongoose = require('mongoose');
-// mongoose.connect("mongodb+srv://admin:admin123@cluster0.sgmlk.mongodb.net/myDB?retryWrites=true&w=majority").then(() => { console.log("Connection successful...!"); }).catch(() => { console.log("Connection failed...!"); });
+// mongoose.connect(`mongodb+srv://${atob(config.mongoDb_Atlas_URL)}?retryWrites=true&w=majority`).then(() => { console.log("Connection successful...!"); }).catch(() => { console.log("Connection failed...!"); });
 
 const MongoClient = require('mongodb').MongoClient;
 const ObjectID = require('mongodb').ObjectId;
 
-console.log("\n\n ============ Available MongoDB methods: =========  \n\n", require('mongodb'));
+// console.log("\n\n ============ Available MongoDB methods: =========  \n\n", require('mongodb'));
 
 // Create a new ObjectID
 var objectId = new ObjectID();
-console.log("\n\n ======== ObjectId ========== \n\n", objectId);
+// console.log("\n\n ======== ObjectId ========== \n\n", objectId);
 
 // const assert = require('assert');
 const bodyParser = require('body-parser');
@@ -32,10 +33,6 @@ app.use(function (req, res, next) {
     res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
     next();
 });
-
-
-//Create HTTP server and listen on port 3000 for requests
-// const server = http.createServer((req, res) => {
 
 // GET ALL EmployeeS 
 app.get('/', (req, res, next) => {
@@ -85,7 +82,7 @@ function mongoOperation(req, res, callback) {
     res.statusCode = 200;
     res.setHeader('Content-Type', 'text/plain');
 
-    const url = 'mongodb+srv://admin:admin123@cluster0.sgmlk.mongodb.net/myDB?retryWrites=true&w=majority';
+    const url = `mongodb+srv://${atob(config.mongoDb_Atlas_URL)}?retryWrites=true&w=majority`;
     // 'mongodb://localhost:27017';
 
     const dbName = 'myDB';
@@ -172,7 +169,3 @@ function mongoOperation(req, res, callback) {
 
 const port = 5000;
 app.listen(process.env.PORT || port, () => console.log(`\n\n Server running at http://localhost:${port} \n\n`))
-
-/*server.listen(port, hostname, () => {
-    console.log(`Server running at http://${hostname}:${port}/`);
-});*/
