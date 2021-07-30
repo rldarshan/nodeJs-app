@@ -10,7 +10,7 @@ const MongoClient = require('mongodb').MongoClient;
 const ObjectID = require('mongodb').ObjectID;
 
 // Create a new ObjectID
-// var objectId = new ObjectID();
+var objectId = new ObjectID();
 
 // const assert = require('assert');
 const bodyParser = require('body-parser');
@@ -114,45 +114,53 @@ function mongoOperation(req, res, callback) {
 
             if (reqest.method == 'GET') {
                 docs = await col.find({}).toArray();
-                docs['status'] = 'Fetching Employee by ID';
+                docs['status'] = 'Fetching All data';
                 console.log(docs);
             } else if (reqest.method == 'POST') {
-                await col.insertOne(reqest.body.emp);
-                docs['status'] = 'Employee Added successfully';
+                if (reqest.body.data) {
+                    await col.insertOne(reqest.body.data);
+                    docs['status'] = 'Data Added successfully';
+                } else {
+                    docs['code'] = 400;
+                    docs['status'] = "Required parameter not sent";
+                }
             } else if (reqest.method == 'PUT') {
+                if (reqest.body._id && reqest['body']['field'] && reqest['body']['fieldValue']) {
+                    let field = reqest['body']['field'];
+                    let fieldValue = reqest['body']['fieldValue'];
 
+                    // First check whether the fields to be updated exists Or not
+
+
+                    await col.updateMany({ _id: reqest.body._id }, { $set: { field: fieldValue } });
+                    docs['status'] = 'Data updated successfully';
+                } else {
+                    docs['code'] = 400;
+                    docs['status'] = "Required parameter not sent";
+                }
             } else if (reqest.method == 'DELETE') {
-                var id = reqest.query['_id'].length == 24 ? ObjectID.createFromHexString(reqest.query['_id']) : +reqest.query['_id']
+                if (reqest.query._id) {
+                    var id = reqest.query['_id'].length == 24 ? ObjectID.createFromHexString(reqest.query['_id']) : +reqest.query['_id']
 
-                await col.deleteOne({ _id: id });
-                docs['status'] = 'Employee Deleted successfully';
+                    await col.deleteOne({ _id: id });
+                    docs['status'] = 'Data with specified ID Deleted successfully';
+                } else {
+                    docs['code'] = 400;
+                    docs['status'] = "Required parameter not sent";
+                }
             }
 
             client.close(); // Close connection
 
             callback(docs);
-
-            /*const docs = await col.find({}).toArray(funtion(err, data) {
-                // Close connection
-                client.close();
-
-                callback(err, docs);
-            });*/
-
-            // Insert a single document
-            // let r = await db.collection('employee').insertOne({ a: 1 });
-            // assert.equal(1, r.insertedCount);
-
-            // Insert multiple documents
-            // r = await db.collection('inserts').insertMany([{ a: 2 }, { a: 3 }]);
-            // assert.equal(2, r.insertedCount);
         } catch (err) {
             console.log(err.stack);
 
             // Close connection
             client.close();
 
-            docs['status'] = 'Something went wrong while deleting Employee';
+            docs['code'] = 500;
+            docs['status'] = 'Something went wrong';
             callback(docs);
         }
     })();
