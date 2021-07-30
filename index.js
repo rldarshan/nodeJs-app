@@ -7,10 +7,13 @@ const express = require('express');
 // mongoose.connect("mongodb+srv://admin:admin123@cluster0.sgmlk.mongodb.net/myDB?retryWrites=true&w=majority").then(() => { console.log("Connection successful...!"); }).catch(() => { console.log("Connection failed...!"); });
 
 const MongoClient = require('mongodb').MongoClient;
-const ObjectID = require('mongodb').ObjectID;
+const ObjectID = require('mongodb').ObjectId;
+
+console.log("\n\n ============ Available MongoDB methods: =========  \n\n", require('mongodb'));
 
 // Create a new ObjectID
 var objectId = new ObjectID();
+console.log("\n\n ======== ObjectId ========== \n\n", objectId);
 
 // const assert = require('assert');
 const bodyParser = require('body-parser');
@@ -140,7 +143,8 @@ function mongoOperation(req, res, callback) {
                 }
             } else if (reqest.method == 'DELETE') {
                 if (reqest.query._id) {
-                    var id = reqest.query['_id'].length == 24 ? ObjectID.createFromHexString(reqest.query['_id']) : +reqest.query['_id']
+                    // let originalHex = objectId.toHexString(reqest.query['_id']);
+                    let id = reqest.query['_id'].length == 24 ? new ObjectID(reqest.query['_id']) : +reqest.query['_id'];
 
                     await col.deleteOne({ _id: id });
                     docs['status'] = 'Data with specified ID Deleted successfully';
@@ -167,7 +171,7 @@ function mongoOperation(req, res, callback) {
 }
 
 //listen for request on port 3000, and as a callback function have the port listened on logged
-app.listen(port, () => console.log(`Server running at http://localhost:${port}`))
+app.listen(port, () => console.log(`\n\n Server running at http://localhost:${port} \n\n`))
 
 /*server.listen(port, hostname, () => {
     console.log(`Server running at http://${hostname}:${port}/`);
