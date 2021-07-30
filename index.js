@@ -170,8 +170,8 @@ function mongoOperation(req, res, callback) {
     })();
 }
 
-//listen for request on port 5000, and as a callback function have the port listened on logged
-app.listen(process.env.PORT || 5000, () => console.log(`\n\n Server running at http://localhost:${port} \n\n`))
+const port = 5000;
+app.listen(process.env.PORT || port, () => console.log(`\n\n Server running at http://localhost:${port} \n\n`))
 
 /*server.listen(port, hostname, () => {
     console.log(`Server running at http://${hostname}:${port}/`);
