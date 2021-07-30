@@ -1,8 +1,10 @@
-const http = require("http");
+const cors = require("cors");
 const hostname = 'localhost';
 const port = 4000;
 
 const express = require('express');
+// const mongoose = require('mongoose');
+// mongoose.connect("mongodb+srv://admin:admin123@cluster0.sgmlk.mongodb.net/myDB?retryWrites=true&w=majority").then(() => { console.log("Connection successful...!"); }).catch(() => { console.log("Connection failed...!"); });
 
 const MongoClient = require('mongodb').MongoClient;
 const ObjectID = require('mongodb').ObjectID;
@@ -18,7 +20,7 @@ var app = express();
 
 // parse requests of content-type - application/x-www-form-urlencoded
 app.use(bodyParser.urlencoded({ extended: true }))
-
+app.use(cors());
 // parse requests of content-type - application/json
 app.use(bodyParser.json())
 
@@ -42,10 +44,6 @@ app.get('/', (req, res, next) => {
             data: data
         });
     });
-});
-
-app.get('/', function (req, res, next) {
-    res.send({ date: new Date() });
 });
 
 // GET SINGLE Employee BY ID 
@@ -86,15 +84,11 @@ function mongoOperation(req, res, callback) {
     res.statusCode = 200;
     res.setHeader('Content-Type', 'text/plain');
 
-    /////////////////////////////////////////////////
-
-    // Connection URL
-    const url = 'mongodb+srv://admin:<password>@cluster0.sgmlk.mongodb.net/myFirstDatabase?retryWrites=true&w=majority';
+    const url = 'mongodb+srv://admin:admin123@cluster0.sgmlk.mongodb.net/myDB?retryWrites=true&w=majority';
     // 'mongodb://localhost:27017';
 
-    // Database Name
-    const dbName = 'employee';
-
+    const dbName = 'myDB';
+    const collectionName = 'myCollection';
     const reqest = req;
 
     (async function () {
@@ -102,25 +96,26 @@ function mongoOperation(req, res, callback) {
 
         /*
         NOTE:
-        >> mongo --version
-        If you are using version >= 3.1.0 change you mongo connection file to ->
+        If you are using MongoDB version >= 3.1.0, then change your mongo connection file to ->
         
          MongoClient.connect("mongodb://localhost:27017/YourDB", {
            useNewUrlParser: true,
            useUnifiedTopology: true
          })
         */
+
         try {
             await client.connect();
-            console.log("Connected correctly to server");
+            console.log("\n\n Connected correctly to server \n\n");
 
-            const col = client.db(dbName).collection(dbName);
+            const col = client.db(dbName).collection(collectionName);
 
-            docs = {};
+            let docs = {};
 
             if (reqest.method == 'GET') {
                 docs = await col.find({}).toArray();
                 docs['status'] = 'Fetching Employee by ID';
+                console.log(docs);
             } else if (reqest.method == 'POST') {
                 await col.insertOne(reqest.body.emp);
                 docs['status'] = 'Employee Added successfully';
@@ -133,8 +128,7 @@ function mongoOperation(req, res, callback) {
                 docs['status'] = 'Employee Deleted successfully';
             }
 
-            // Close connection
-            client.close();
+            client.close(); // Close connection
 
             callback(docs);
 
@@ -163,34 +157,6 @@ function mongoOperation(req, res, callback) {
         }
     })();
 }
-
-/*function mongoOperation(callback) {
-        (async function() {
-            try {
-                // Use connect method to connect to the server
-                MongoClient.connect(url, { useUnifiedTopology: true, useNewUrlParser: true }, function(err, client) {
-                    if (client) {
-                        // assert.equal(null, err);
-                        console.log("Connected successfully to server");
-
-                        const emp = client.db(dbName).collection("employee");
-
-                        // emp.insertOne(data);
-
-                        const emp_data = await client.db(dbName).collection("employee").find({}).toArray();
-
-                        callback(emp_data);
-
-                        client.close();
-                    } else {
-                        console.log("Unable to connect to MongoDB");
-                    }
-                });
-            } catch (err) {
-                console.log(err.stack);
-            }
-        })();
-    }*/
 
 //listen for request on port 3000, and as a callback function have the port listened on logged
 app.listen(port, () => console.log(`Server running at http://localhost:${port}`))
