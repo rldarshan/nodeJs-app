@@ -117,8 +117,10 @@ function mongoOperation(req, res, callback) {
             } else if (reqest.method == 'POST') {
                 if (reqest.body.data) {
                     await col.insertOne(reqest.body.data);
+
+                    docs['code'] = 200;
                     docs['status'] = 'Data Added successfully';
-                    console.log(docs['status']);
+                    console.log(docs);
                 } else {
                     docs['code'] = 400;
                     docs['status'] = "Required parameter not sent";
@@ -144,7 +146,8 @@ function mongoOperation(req, res, callback) {
 
                     await col.deleteOne({ _id: id });
                     docs['status'] = 'Data with specified ID Deleted successfully';
-                    console.log(docs['status']);
+                    docs['code'] = 200;
+                    console.log(docs);
                 } else {
                     docs['code'] = 400;
                     docs['status'] = "Required parameter not sent";
